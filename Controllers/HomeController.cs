@@ -18,6 +18,11 @@ namespace Datastar.Controllers
             return View();
         }
 
+        public IActionResult MultiStepForm()
+        {
+            return View();
+        }
+
         [HttpGet("displayDate")]
         public async Task DisplayDate()
         {

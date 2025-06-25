@@ -1,0 +1,168 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Datastar dotnet - Wizard form";
+}
+<div data-signals="{
+      currentStep: 'start',
+      totalSteps: 5,
+      sections: {
+        start:          { skip: false },
+        aboutYou:       { skip: false },
+        pets:           { skip: false },
+        food:           { skip: false },
+        review:         { skip: false }
+      }
+    }">
+    <h2>Multi-Step Form</h2>
+
+    <!-- Progress bar calculates index via data-step attributes -->
+    <progress id="formProgress" data-attr-max="$totalSteps" 
+    data-attr-value="Array.from(document.querySelectorAll('#exampleWizard section[data-step]')).findIndex(s=>s.getAttribute('data-step') === $currentStep) + 1">
+    </progress>
+    <p>
+        Step <span data-text="Array.from(document.querySelectorAll('#exampleWizard section[data-step]')).findIndex(s=> s.getAttribute('data-step') === $currentStep) + 1"></span>
+        of <span data-text="$totalSteps"></span>
+    </p>
+
+    <form id="exampleWizard">
+
+        <!-- Start -->
+        <section data-step="start" data-show="$currentStep === 'start'">
+            <h2>Start</h2>
+            <p>This is an example Form Wizard using Datastar. This form doesn't submit or collect anything!</p>
+            <label>
+                <input type="checkbox" name="agree" value="Yes" data-bind="agree" required>
+                I agree!
+            </label><br/>
+            <button type="button" data-on-click="$currentStep = 'aboutYou'" data-attr-disabled="$agree === ''">
+                Next
+            </button>
+        </section>
+
+        <!-- About You -->
+        <section data-step="aboutYou" data-show="$currentStep === 'aboutYou'">
+            <h2>About you</h2>
+            <label>
+                Name:
+                <input type="text" name="name" data-bind="name" data-on-input="validateField(evt.target)" required>
+            </label>        
+
+            <label data-show="$name !== ''">
+                Age:
+                <input type="text" name="age" data-bind="age" data-on-input="validateField(evt.target)"
+                       data-attr-required="$name !== ''">
+            </label>           
+            <fieldset>
+                <legend>Do you have a pet?</legend>
+                <label>
+                    <input type="radio" name="pets" value="Yes" data-bind="pets"
+                           data-on-change="pets = 'Yes'; $sections.pets.skip = false">
+                    Yes
+                </label>
+                <label>
+                    <input type="radio" name="pets" value="No" data-bind="pets"
+                           data-on-change="pets = 'No'; $sections.pets.skip = true"> No
+                </label>
+            </fieldset>
+            <button type="button" data-on-click="$currentStep='start'" class="secondary">Back</button>
+            <button type="button"
+                    data-on-click="validateStep('aboutYou') && ($currentStep = $sections.pets.skip ? 'food' : 'pets')">
+                Next
+            </button>
+        </section>
+
+        <!-- About your pet -->
+        <section data-step="pets" data-show="$currentStep === 'pets'">
+            <h2>About your pet</h2>
+
+            <label>
+                What's your Pet's name, <span data-text="$name"></span>?:
+                <input type="text" name="petName" data-bind="petName"
+                       data-attr-required="$pets === 'Yes'" data-on-input="validateField(evt.target)">
+            </label>           
+            <label>
+                What kind of animal is it?
+                <input type="text" name="petType" data-bind="petType"
+                       data-attr-required="$pets === 'Yes'" data-on-input="validateField(evt.target)">
+            </label>           
+
+            <button type="button" data-on-click="$currentStep='aboutYou'" class="secondary">Back</button>
+            <button type="button" data-on-click="validateStep('pets') && ($currentStep = 'food')">
+                Next
+            </button>
+        </section>
+
+        <!-- Food -->
+        <section data-step="food" data-show="$currentStep === 'food'">
+            <h2>Favourite food</h2>
+            <fieldset>
+                <legend>What's your favourite biscuit, <span data-text="$name"></span>?</legend>
+                <label><input type="radio" name="biscuit" data-bind="biscuit" value="Custard Cream"> Custard cream</label>
+                <label><input type="radio" name="biscuit" data-bind="biscuit" value="Wagon Wheel"> Wagon wheel</label>
+                <label><input type="radio" name="biscuit" data-bind="biscuit" value="Twix"> Twix</label>
+                <label><input type="radio" name="biscuit" data-bind="biscuit" value="Bourbon"> Bourbon</label>
+                <label><input type="radio" name="biscuit" data-bind="biscuit" value="Other"> Other</label>
+            </fieldset>
+            <label data-show="$biscuit === 'Other'">
+                Other:
+                <input type="text" name="otherBiscuit" data-bind="biscuitOther"
+                       data-on-input="validateField(evt.target)" data-attr-required="$biscuit === 'Other'">
+            </label>
+            <button type="button" class="secondary"
+                    data-on-click="($currentStep = $sections.pets.skip ? 'aboutYou' : 'pets')">
+                Back
+            </button>
+            <button type="button"
+                    data-on-click="validateStep('food') && ($currentStep='review')">
+                Next
+            </button>
+        </section>
+
+        <!-- Review -->
+        <section data-step="review" data-show="$currentStep === 'review'">
+            <h2>Review & Submit</h2>
+            <p><strong>Name:</strong> <span data-text="$name"></span></p>
+
+            <p><strong>Age:</strong> <span data-text="$age"></span></p>
+            
+            <div data-show="$pets === 'Yes'">
+                <p><strong>Pet:</strong> <span data-text="$petName"></span> (<span data-text="$petType"></span>)</p>
+            </div>
+            <div data-show="$pets === 'No'">
+                <p><strong>Pets:</strong> None</p>
+            </div>
+            <p><strong>Biscuit:</strong> <span data-text="$biscuit"></span> <span data-show="$biscuit === 'Other'">(<span data-text="$biscuitOther"></span>)</span></p>
+
+            <button type="button" data-on-click="$currentStep='food'" class="secondary">Back</button>
+            <button type="submit">Submit (this just reloads the form)</button>
+        </section>
+
+    </form>
+</div>
+
+    @section Scripts{
+    <script>
+        function validateStep(key) {
+            const sections = Array.from(document.querySelectorAll('form > section[data-step]'));
+            const index = sections.findIndex(s => s.getAttribute('data-step') === key);
+            const section = sections[index];
+            let allValid = true;
+            section.querySelectorAll('input, select, textarea').forEach(el => {
+                const valid = el.reportValidity();
+                el.setAttribute('aria-invalid', (!valid).toString());
+                if (!valid) allValid = false;
+            });
+            return allValid;
+        }
+
+        function validateField(el) {
+            const valid = el.checkValidity();
+            el.setAttribute('aria-invalid', (!valid).toString());
+            if (!valid) el.reportValidity();
+            return valid;
+        }
+
+    </script>
+    }
