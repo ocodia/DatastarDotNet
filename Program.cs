@@ -1,9 +1,12 @@
+using Datastar.Services;
 using StarFederation.Datastar.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
+
 builder.Services.AddDatastar();
 
 var app = builder.Build();

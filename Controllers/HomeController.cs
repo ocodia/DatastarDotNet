@@ -1,5 +1,9 @@
+using Datastar.Common;
+using Datastar.Models;
+using Datastar.Services;
 using Microsoft.AspNetCore.Mvc;
 using StarFederation.Datastar.DependencyInjection;
+using System.Runtime.Intrinsics.X86;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -8,9 +12,13 @@ namespace Datastar.Controllers
     public class HomeController : Controller
     {
         private IServiceProvider _services;
-        public HomeController(IServiceProvider services)
+        private readonly IViewRenderService _viewRenderer;
+
+        public HomeController(IServiceProvider services, IViewRenderService viewRenderer)
         {
             _services = services;
+            _viewRenderer = viewRenderer;
+
         }
 
         public IActionResult Index()
@@ -21,6 +29,24 @@ namespace Datastar.Controllers
         public IActionResult MultiStepForm()
         {
             return View();
+        }
+
+        [HttpGet("displayTime")]
+        public IActionResult DisplayTimeFragment()
+        {
+            var _sse = _services.GetRequiredService<IDatastarServerSentEventService>();
+
+            var model = new TimeViewModel
+            {
+                Time = DateTime.Now.ToString("HH:mm:ss")
+            };
+
+            return new SsePartialViewResult(
+                "_TimeFragment",
+                model,
+                _viewRenderer,
+                _sse
+            );
         }
 
         [HttpGet("displayDate")]

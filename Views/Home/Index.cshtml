@@ -13,6 +13,16 @@
         <div id="target">Date will be returned here...</div>
     </article>
 
+    <h2>Get Fragment (Razor view)</h2>
+    <p>Make a GET request to the <code>/displaytime</code> controller endpoint and get razor generated HTML fragment response</p>
+    <article>
+        <section>
+            <button data-on-click="@@get('/displayTime')">Display Time</button>
+        </section>
+
+        <div id="timetarget">Time will be returned here...</div>
+    </article>
+
     <h2>Post Signals</h2>
     <p>POST Signals to the <code>/changeoutput</code> controller endpoint and merge Signals from response</p>
 
