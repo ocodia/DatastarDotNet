@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<main class="container" id="main" data-signals="{'input':'','output':'what'}">
+    <button class="btn btn-primary" data-on-click="@@get('/displayDate')">Display Date</button>
+    <div id="target"></div>
+    <input type="text" placeholder="input:" data-bind-input /><br />
+    <span data-text="$output"></span>
+    <button data-on-click="@@post('/changeoutput')">Change Output</button>
+</main>
