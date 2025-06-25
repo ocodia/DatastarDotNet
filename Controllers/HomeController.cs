@@ -3,7 +3,6 @@ using Datastar.Models;
 using Datastar.Services;
 using Microsoft.AspNetCore.Mvc;
 using StarFederation.Datastar.DependencyInjection;
-using System.Runtime.Intrinsics.X86;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
