@@ -8,25 +8,24 @@ namespace Datastar.Common
     {
         private readonly string _viewName;
         private readonly object _model;
-        private readonly IViewRenderService _renderer;
-        private readonly IDatastarServerSentEventService _sse;
+       
 
-        public SsePartialViewResult(
-            string viewName,
-            object model,
-            IViewRenderService renderer,
-            IDatastarServerSentEventService sse)
+        public SsePartialViewResult(string viewName, object model)
         {
             _viewName = viewName;
-            _model = model;
-            _renderer = renderer;
-            _sse = sse;
+            _model = model;           
         }
 
         public override async Task ExecuteResultAsync(ActionContext context)
         {
-            var html = await _renderer.RenderToStringAsync(_viewName, _model);
-            await _sse.MergeFragmentsAsync(html);
+            var renderer = context.HttpContext.RequestServices
+                             .GetRequiredService<IViewRenderService>();
+
+            var sse = context.HttpContext.RequestServices
+                             .GetRequiredService<IDatastarServerSentEventService>();
+
+            var html = await renderer.RenderToStringAsync(_viewName, _model);
+            await sse.MergeFragmentsAsync(html);
         }
     }
 }

@@ -1,6 +1,5 @@
 using Datastar.Common;
 using Datastar.Models;
-using Datastar.Services;
 using Microsoft.AspNetCore.Mvc;
 using StarFederation.Datastar.DependencyInjection;
 using System.Text.Json;
@@ -11,13 +10,10 @@ namespace Datastar.Controllers
     public class HomeController : Controller
     {
         private IServiceProvider _services;
-        private readonly IViewRenderService _viewRenderer;
 
-        public HomeController(IServiceProvider services, IViewRenderService viewRenderer)
+        public HomeController(IServiceProvider services)
         {
             _services = services;
-            _viewRenderer = viewRenderer;
-
         }
 
         public IActionResult Index()
@@ -33,19 +29,13 @@ namespace Datastar.Controllers
         [HttpGet("displayTime")]
         public IActionResult DisplayTimeFragment()
         {
-            var _sse = _services.GetRequiredService<IDatastarServerSentEventService>();
-
             var model = new TimeViewModel
             {
                 Time = DateTime.Now.ToString("HH:mm:ss")
             };
 
-            return new SsePartialViewResult(
-                "_TimeFragment",
-                model,
-                _viewRenderer,
-                _sse
-            );
+            // This is the way!
+            return new SsePartialViewResult("_TimeFragment", model);
         }
 
         [HttpGet("displayDate")]
