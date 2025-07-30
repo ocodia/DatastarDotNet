@@ -1,4 +1,3 @@
-using Datastar.Common;
 using Datastar.Models;
 using Microsoft.AspNetCore.Mvc;
 using StarFederation.Datastar.DependencyInjection;
@@ -10,10 +9,12 @@ namespace Datastar.Controllers
     public class HomeController : Controller
     {
         private IServiceProvider _services;
+        private IDatastarService _ds;
 
-        public HomeController(IServiceProvider services)
+        public HomeController(IServiceProvider services, IDatastarService ds)
         {
             _services = services;
+            _ds = ds;
         }
 
         public IActionResult Index()
@@ -34,8 +35,7 @@ namespace Datastar.Controllers
                 Time = DateTime.Now.ToString("HH:mm:ss")
             };
 
-            // This is the way!
-            return new SsePartialViewResult("_TimeFragment", model);
+            return PartialView(viewName: "_TimeFragment", model);
         }
 
         [HttpGet("displayDate")]
@@ -43,10 +43,8 @@ namespace Datastar.Controllers
         {
             string today = DateTime.Now.ToString("yy-MM-dd HH:mm:ss");
             
-            var _sse = _services.GetRequiredService<IDatastarServerSentEventService>();
-
-            // push the fragment back over SSE
-            await _sse.MergeFragmentsAsync($"""
+            // Push the fragment back as SSE
+            await _ds.PatchElementsAsync($"""
             <div id='target'>
               <div id='date' role="group">             
                 <input type="text" value="{today}"/>
@@ -59,9 +57,7 @@ namespace Datastar.Controllers
         [HttpGet("removedate")]
         public async Task RemoveDate()
         {
-            var _sse = _services.GetRequiredService<IDatastarServerSentEventService>();
-
-            await _sse.RemoveFragmentsAsync("#date");
+            await _ds.RemoveElementAsync("#date");
         }
 
         public record Signals
@@ -80,12 +76,10 @@ namespace Datastar.Controllers
         [HttpPost("changeOutput")]
         public async Task ChangeOutput()
         {
-            var sse = _services.GetRequiredService<IDatastarServerSentEventService>();
-            var dsSignals = _services.GetRequiredService<IDatastarSignalsReaderService>();
-
-            Signals signals = await dsSignals.ReadSignalsAsync<Signals>();
+            
+            Signals signals = await _ds.ReadSignalsAsync<Signals>();
             Signals newSignals = new() { Output = $"{signals.Input}" };
-            await sse.MergeSignalsAsync(newSignals.Serialize());
+            await _ds.PatchSignalsAsync(newSignals);
         }
     }
 }
